@@ -1,0 +1,420 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>土地整治项目评估系统</title>
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .factor {
+            border: 1px solid #ddd;
+            margin: 15px 0;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        .factor-header {
+            padding: 15px;
+            cursor: pointer;
+            background: #e3f2fd;
+            display: flex;
+            align-items: center;
+        }
+        .collapse-icon {
+            margin-right: 10px;
+            transition: transform 0.3s;
+        }
+        .collapsed .collapse-icon {
+            transform: rotate(-90deg);
+        }
+        .subfactors {
+            padding: 10px;
+            display: block;
+        }
+        .subfactor {
+            margin: 10px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        input {
+            width: 120px;
+            padding: 8px;
+            margin-left: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background: #2196F3;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        #results {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>土地整治项目评估系统</h1>
+        
+        <form id="evaluationForm">
+            <!-- 方案的完备度 -->
+            <div class="factor">
+                <div class="factor-header" onclick="toggleFactor(this)">
+                    <svg class="collapse-icon" width="12" height="12" viewBox="0 0 24 24">
+                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                    </svg>
+                    <h2>方案的完备度（总权重：15%）</h2>
+                </div>
+                <div class="subfactors">
+                    <div class="subfactor">
+                        <label>规划方案的科学性 <span class="weight">权重3%</span></label>
+                        <input type="number" 
+                               data-weight="0.03" 
+                               data-formula="threshold" 
+                               data-thresholds='{"优":70,"良":50}'oninput="validateInput(this)" 
+                               min="0" max="100" >
+                    </div>
+                    <div class="subfactor">
+                        <label>实施方案的科学性 <span class="weight">权重3%</span></label>
+                        <input type="number" data-weight="0.03" data-formula="threshold" data-thresholds='{"优":70,"良":50}'oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>管理方案的科学性 <span class="weight">权重3%</span></label>
+                        <input type="number" data-weight="0.03" data-formula="threshold" data-thresholds='{"优":70,"良":50}'oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>供地方案的科学性 <span class="weight">权重3%</span></label>
+                        <input type="number" data-weight="0.03" data-formula="threshold" data-thresholds='{"优":70,"良":50}'oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>招商方案的科学性 <span class="weight">权重3%</span></label>
+                        <input type="number" data-weight="0.03" data-formula="threshold" data-thresholds='{"优":70,"良":50}'oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                </div>
+            </div>
+
+            <!—工作的衔接度 -->
+            <div class="factor">
+                <div class="factor-header" onclick="toggleFactor(this)">
+                    <svg class="collapse-icon" width="12" height="12" viewBox="0 0 24 24">
+                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                    </svg>
+                    <h2>工作的衔接度（总权重：18%）</h2>
+                </div>
+                <div class="subfactors">
+                    <div class="subfactor">
+                        <label>前序工作的干扰度 <span class="weight">权重3%</span></label>
+                        <input type="number" data-weight="0.03" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>相关规划衔接度 <span class="weight">权重3%</span></label>
+                        <input type="number" data-weight="0.03" data-formula="threshold" data-thresholds='{"优":70,"良":50}'oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>资金保障的可靠度 <span class="weight">权重3%</span></label>
+                        <input type="number" data-weight="0.03" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>部门间的衔接度 <span class="weight">权重3%</span></label>
+                        <input type="number" data-weight="0.03" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>工序间的衔接度 <span class="weight">权重3%</span></label>
+                        <input type="number" data-weight="0.03" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>审批结果合格性 <span class="weight">权重3%</span></label>
+                        <input type="number" data-weight="0.03" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                </div>
+            </div>
+
+            <!—质量的卓越性 -->
+            <div class="factor">
+                <div class="factor-header" onclick="toggleFactor(this)">
+                    <svg class="collapse-icon" width="12" height="12" viewBox="0 0 24 24">
+                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                    </svg>
+                    <h2>质量的卓越性（总权重：26%）</h2>
+                </div>
+                <div class="subfactors">
+                    <div class="subfactor">
+                        <label>道路体系成熟度 <span class="weight">权重3%</span></label>
+                        <input type="number" data-weight="0.03" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>给水保障度 <span class="weight">权重3%</span></label>
+                        <input type="number" data-weight="0.03" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>排水保障度 <span class="weight">权重3%</span></label>
+                        <input type="number" data-weight="0.03" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>供电保障度 <span class="weight">权重3%</span></label>
+                        <input type="number" data-weight="0.03" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>供暖保障度 <span class="weight">权重2%</span></label>
+                        <input type="number" data-weight="0.02" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>燃气保障度 <span class="weight">权重3%</span></label>
+                        <input type="number" data-weight="0.03" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>通讯保障度 <span class="weight">权重3%</span></label>
+                        <input type="number" data-weight="0.03" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>场地平整度 <span class="weight">权重3%</span></label>
+                        <input type="number" data-weight="0.03" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>土方平衡度 <span class="weight">权重3%</span></label>
+                        <input type="number" data-weight="0.03" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                </div>
+            </div>
+
+            <!—理念先进度 -->
+            <div class="factor">
+                <div class="factor-header" onclick="toggleFactor(this)">
+                    <svg class="collapse-icon" width="12" height="12" viewBox="0 0 24 24">
+                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                    </svg>
+                    <h2>理念先进度（总权重：12%）</h2>
+                </div>
+                <div class="subfactors">
+                    <div class="subfactor">
+                        <label>工程低碳度 <span class="weight">权重2%</span></label>
+                        <input type="number" data-weight="0.02" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>空间集约度 <span class="weight">权重2%</span></label>
+                        <input type="number" data-weight="0.02" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>管廊综合度 <span class="weight">权重2%</span></label>
+                        <input type="number" data-weight="0.02" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>创新技术应用率<span class="weight">权重2%</span></label>
+                        <input type="number" data-weight="0.02" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>智慧管理覆盖率 <span class="weight">权重2%</span></label>
+                        <input type="number" data-weight="0.02" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>智能设备使用率 <span class="weight">权重2%</span></label>
+                        <input type="number" data-weight="0.02" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                </div>
+            </div>
+
+            <!—效益的显著度 -->
+            <div class="factor">
+                <div class="factor-header" onclick="toggleFactor(this)">
+                    <svg class="collapse-icon" width="12" height="12" viewBox="0 0 24 24">
+                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                    </svg>
+                    <h2>效益的显著度（总权重：9%）</h2>
+                </div>
+                <div class="subfactors">
+                    <div class="subfactor">
+                        <label>经济效益显著度 <span class="weight">权重3%</span></label>
+                        <input type="number" data-weight="0.03" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>社会效益显著度 <span class="weight">权重3%</span></label>
+                        <input type="number" data-weight="0.03" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>生态效益显著度 <span class="weight">权重3%</span></label>
+                        <input type="number" data-weight="0.03" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                </div>
+            </div>
+
+            <!—安全的可靠度 -->
+            <div class="factor">
+                <div class="factor-header" onclick="toggleFactor(this)">
+                    <svg class="collapse-icon" width="12" height="12" viewBox="0 0 24 24">
+                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                    </svg>
+                    <h2>安全的可靠度（总权重：20%）</h2>
+                </div>
+                <div class="subfactors">
+                    <div class="subfactor">
+                        <label>资金抗风险度 <span class="weight">权重2%</span></label>
+                        <input type="number" data-weight="0.02" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>管理抗风险度 <span class="weight">权重2%</span></label>
+                        <input type="number" data-weight="0.02" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>环境抗风险度 <span class="weight">权重2%</span></label>
+                        <input type="number" data-weight="0.02" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>地质灾害防治度<span class="weight">权重2%</span></label>
+                        <input type="number" data-weight="0.02" data-formula="threshold" data-thresholds='{"优":70,"良":50}'oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>洪涝灾害防治度 <span class="weight">权重2%</span></label>
+                        <input type="number" data-weight="0.02" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>土壤污染修复度 <span class="weight">权重2%</span></label>
+                        <input type="number" data-weight="0.02" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>生态环境扰动度 <span class="weight">权重2%</span></label>
+                        <input type="number" data-weight="0.02" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>土地管理有效度 <span class="weight">权重2%</span></label>
+                        <input type="number" data-weight="0.02" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>安全措施得当度 <span class="weight">权重2%</span></label>
+                        <input type="number" data-weight="0.02" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                    <div class="subfactor">
+                        <label>安全事故危害度 <span class="weight">权重2%</span></label>
+                        <input type="number" data-weight="0.02" data-formula="linear" data-min="0" data-max="100"oninput="validateInput(this)" 
+                        min="0" max="100">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit">计算综合评分</button>
+        </form>
+
+        <div id="results">
+            <h2>评估结果</h2>
+            <div id="factorScores"></div>
+            <div id="totalScore"></div>
+        </div>
+    </div>
+
+    <script>
+        // 展开/收起功能
+        function toggleFactor(header) {
+            const factor = header.parentElement;
+            factor.classList.toggle('collapsed');
+            const subfactors = factor.querySelector('.subfactors');
+            subfactors.style.display = factor.classList.contains('collapsed') ? 'none' : 'block';
+        }
+
+        // 计算逻辑
+        document.getElementById('evaluationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let totalScore = 0;
+            const results = [];
+            
+            document.querySelectorAll('.factor').forEach(factor => {
+                const factorName = factor.querySelector('h2').textContent;
+                let factorScore = 0;
+                let subItems = [];
+                
+                factor.querySelectorAll('input').forEach(input => {
+                    const value = parseFloat(input.value) || 0;
+                    const weight = parseFloat(input.dataset.weight);
+                    
+                    // 标准化计算
+                    let score = 0;
+                    switch(input.dataset.formula) {
+                        case 'linear':
+                            const min = parseFloat(input.dataset.min);
+                            const max = parseFloat(input.dataset.max);
+                            score = ((value - min) / (max - min)) * 100;
+                            break;
+                        case 'threshold':
+                            const thresholds = JSON.parse(input.dataset.thresholds);
+                            score = value >= thresholds.优 ? 100 :
+                                   value >= thresholds.良 ? 80 : 60;
+                            break;
+                    }
+                    
+                    const weighted = score * weight;
+                    factorScore += weighted;
+                    
+                    subItems.push(`
+                        <div>${input.parentElement.querySelector('label').textContent}：
+                        ${score.toFixed(1)} × ${weight} = ${weighted.toFixed(2)}</div>
+                    `);
+                });
+                
+                totalScore += factorScore;
+                results.push(`
+                    <div class="factor-result">
+                        <h3>${factorName}</h3>
+                        ${subItems.join('')}
+                        <div>小计：${factorScore.toFixed(2)}</div>
+                    </div>
+                `);
+            });
+            
+            document.getElementById('factorScores').innerHTML = results.join('');
+            document.getElementById('totalScore').innerHTML = `
+                <h3>总评分：${totalScore.toFixed(2)}</h3>
+            `;
+        });
+    </script>
+</body>
+</html>

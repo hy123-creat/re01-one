@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>指标体系和权重管理系统</title>
+    <style>
+        /* 保持原有样式不变 */
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .level1-group {
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background: #f8f9fa;
+            position: relative;
+        }
+
+        .toggle-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .level2-container {
+            display: none;
+        }
+
+        .level2-item {
+            margin: 10px 0 10px 30px;
+            padding: 10px;
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+        }
+
+        input[type="text"] {
+            width: 200px;
+            padding: 6px;
+        }
+
+        input[type="number"] {
+            width: 100px;
+            padding: 6px;
+        }
+
+        .auto-sum {
+            background: #e9ecef;
+            cursor: not-allowed;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-add {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-del {
+            background: #dc3545;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>指标体系和权重管理系统</h1>
+
+        <div id="indicators"></div>
+
+        <div style="margin-top: 20px;">
+            <button class="btn btn-add" onclick="saveData()">保存配置</button>
+        </div>
+    </div>
+
+    <script>
+        let level1Counter = 0;
+
+        const predefinedLevels = {
+            "方案的完备度": [
+                "规划方案的科学性", "实施方案的科学性", "管理方案的科学性",
+                "供地方案的科学性", "招商方案的科学性"
+            ],
+            "工作的衔接度": [
+                "前序工作的干扰度", "相关规划的衔接度", "资金保障的可靠度",
+                "部门间的衔接度", "工序间的衔接度", "审批结果合格性"
+            ],
+            "质量的卓越性": [
+                "道路体系成熟度", "给水保障度", "排水保障度", "供电保障度", "供暖保障度",
+                "燃气保障度", "通讯保障度", "场地平整完成度", "土方平衡度"
+            ],
+            "理念的先进度": [
+                "工程低碳度", "空间集约度", "管廊综合度", "创新技术应用率", "智慧管理覆盖率", "智能设备使用率"
+            ],
+            "效益的显著度": [
+                "经济效益显著度", "社会效益显著度", "生态效益显著度"
+            ],
+            "安全的可靠度": [
+                "资金抗风险度", "管理抗风险度", "环境抗风险度", "地质灾害防治度", 
+                "洪涝灾害防治度", "土壤污染修复度", "生态环境扰动度", "土地管护有效度",
+                "安全措施得当度", "安全事故危害度"
+            ]
+        };
+
+        // 初始化时自动创建所有预定义指标
+        function initializePredefinedLevels() {
+            Object.entries(predefinedLevels).forEach(([level1Name, level2Names]) => {
+                const level1Id = addLevel1(level1Name);
+                level2Names.forEach(level2 => addLevel2(level1Id, level2));
+                
+                // 设置默认展开二级指标
+                const container = document.getElementById(level1Id).querySelector('.level2-container');
+                container.style.display = 'block'; // 默认展开
+                const button = document.querySelector(`#${level1Id} .toggle-btn`);
+                button.textContent = '收起'; // 修改按钮文本为"收起"
+            });
+        }
+
+        function addLevel1(name) {
+            level1Counter++;
+            const level1Id = `level1-${level1Counter}`;
+
+            const template = 
+                `<div class="level1-group" id="${level1Id}">
+                    <div class="input-group">
+                        <input type="text" value="${name}" readonly>
+                        <input type="number" class="auto-sum" readonly>
+                        <button class="btn btn-add" onclick="addLevel2('${level1Id}')">+ 添加</button>
+                        <button class="btn toggle-btn" onclick="toggleLevel2('${level1Id}')">展开</button>
+                    </div>
+                    <div class="level2-container"></div>
+                </div>`;
+
+            document.getElementById('indicators').insertAdjacentHTML('beforeend', template);
+            return level1Id;
+        }
+
+        // 展开/收起一级指标
+        function toggleLevel2(id) {
+            const container = document.getElementById(id).querySelector('.level2-container');
+            const button = document.querySelector(`#${id} .toggle-btn`);
+            container.style.display = container.style.display === 'none' ? 'block' : 'none';
+            button.textContent = container.style.display === 'none' ? '展开' : '收起';
+        }
+
+        function addLevel2(parentId, name = '') {
+            const container = document.getElementById(parentId).querySelector('.level2-container');
+            const level2Id = Date.now();
+
+            const template = 
+                `<div class="level2-item" id="level2-${level2Id}">
+                    <div class="input-group">
+                        <input type="text" placeholder="二级指标名称" value="${name}">
+                        <input type="number" min="0" max="1" step="0.01" oninput="updateLevel1Sum('${parentId}')">
+                        <button class="btn btn-del" onclick="deleteLevel2('level2-${level2Id}')">×</button>
+                    </div>
+                </div>`;
+
+            container.insertAdjacentHTML('beforeend', template);
+            updateLevel1Sum(parentId);
+        }
+
+        function deleteLevel2(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.remove();
+                const parentId = element.closest('.level1-group').id;
+                updateLevel1Sum(parentId);
+            }
+        }
+
+        function updateLevel1Sum(parentId) {
+            const level1 = document.getElementById(parentId);
+            const inputs = level1.querySelectorAll('.level2-item input[type="number"]');
+            const sumInput = level1.querySelector('.auto-sum');
+
+            let total = 0;
+            inputs.forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+
+            sumInput.value = total.toFixed(2);
+        }
+
+        function saveData() {
+            const data = [];
+            let totalWeight = 0;
+
+            document.querySelectorAll('.level1-group').forEach(level1 => {
+                const entry = {
+                    level1: {
+                        name: level1.querySelector('input[type="text"]').value,
+                        totalWeight: parseFloat(level1.querySelector('.auto-sum').value) || 0
+                    },
+                    level2: []
+                };
+
+                level1.querySelectorAll('.level2-item').forEach(level2 => {
+                    entry.level2.push({
+                        name: level2.querySelector('input[type="text"]').value,
+                        weight: parseFloat(level2.querySelector('input[type="number"]').value) || 0
+                    });
+                });
+
+                data.push(entry);
+                totalWeight += entry.level1.totalWeight;
+            });
+
+            if (Math.abs(totalWeight - 1) > 0.001) {
+                alert(`权重总和 ${totalWeight.toFixed(2)} ≠ 1，请调整权重配置！`);
+                return;
+            }
+
+            // 保存为文件
+            const date = new Date();
+            const dateString = date.toISOString().split('T')[0].replace(/-/g, ''); // 获取格式如：20250228
+            const fileName = `指标数据_${dateString}.json`;
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            alert('配置验证通过，数据已保存！');
+        }
+
+        // 页面加载时自动初始化
+        initializePredefinedLevels();
+    </script>
+</body>
+</html>
