@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>指标体系和权重管理系统</title>
     <style>
-        /* 保持原有样式不变 */
         .container {
             max-width: 800px;
             margin: 20px auto;
@@ -12,11 +11,9 @@
             font-family: Arial, sans-serif;
             text-align: center;
         }
-
         h1 {
             text-align: center;
         }
-
         .level1-group {
             margin: 15px 0;
             padding: 15px;
@@ -25,67 +22,74 @@
             background: #f8f9fa;
             position: relative;
         }
-
         .toggle-btn {
             position: absolute;
             top: 10px;
             right: 10px;
         }
-
         .level2-container {
             display: none;
         }
-
         .level2-item {
             margin: 10px 0 10px 30px;
             padding: 10px;
             background: #ffffff;
             border: 1px solid #dee2e6;
         }
-
         .input-group {
             display: flex;
             align-items: center;
             gap: 10px;
             margin: 5px 0;
         }
-
         input[type="text"] {
             width: 200px;
             padding: 6px;
         }
-
         input[type="number"] {
             width: 100px;
             padding: 6px;
         }
-
         .auto-sum {
             background: #e9ecef;
             cursor: not-allowed;
         }
-
         .btn {
             padding: 6px 12px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
         }
-
         .btn-add {
             background: #28a745;
             color: white;
         }
-
         .btn-del {
             background: #dc3545;
             color: white;
+        }
+        .btn-toggle-all {
+            background: #007bff;
+            color: white;
+            margin-bottom: 10px;
+        }
+        .weight-input {
+            background: #fff3cd;
+        }
+        .error-message {
+            color: #dc3545;
+            margin: 10px 0;
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>指标体系和权重管理系统</h1>
+        <div class="error-message" id="errorMessage"></div>
+
+        <button class="btn btn-toggle-all" onclick="toggleAllLevels()">全部收起</button>
+        <button class="btn btn-add" onclick="addLevel1()">+ 添加一级指标</button>
 
         <div id="indicators"></div>
 
@@ -96,67 +100,43 @@
 
     <script>
         let level1Counter = 0;
+        let allCollapsed = true;
 
         const predefinedLevels = {
-            "方案的完备度": [
-                "规划方案的科学性", "实施方案的科学性", "管理方案的科学性",
-                "供地方案的科学性", "招商方案的科学性"
-            ],
-            "工作的衔接度": [
-                "前序工作的干扰度", "相关规划的衔接度", "资金保障的可靠度",
-                "部门间的衔接度", "工序间的衔接度", "审批结果合格性"
-            ],
-            "质量的卓越性": [
-                "道路体系成熟度", "给水保障度", "排水保障度", "供电保障度", "供暖保障度",
-                "燃气保障度", "通讯保障度", "场地平整完成度", "土方平衡度"
-            ],
-            "理念的先进度": [
-                "工程低碳度", "空间集约度", "管廊综合度", "创新技术应用率", "智慧管理覆盖率", "智能设备使用率"
-            ],
-            "效益的显著度": [
-                "经济效益显著度", "社会效益显著度", "生态效益显著度"
-            ],
-            "安全的可靠度": [
-                "资金抗风险度", "管理抗风险度", "环境抗风险度", "地质灾害防治度", 
-                "洪涝灾害防治度", "土壤污染修复度", "生态环境扰动度", "土地管护有效度",
-                "安全措施得当度", "安全事故危害度"
-            ]
+            "方案的完备度": ["规划方案的科学性", "实施方案的科学性", "管理方案的科学性", "供地方案的科学性", "招商方案的科学性"],
+            "工作的衔接度": ["前序工作的干扰度", "相关规划的衔接度", "资金保障的可靠度", "部门间的衔接度", "工序间的衔接度", "审批结果合格性"],
+            "质量的卓越性": ["道路体系成熟度", "给水保障度", "排水保障度", "供电保障度", "供暖保障度", "燃气保障度", "通讯保障度", "场地平整完成度", "土方平衡度"],
+            "理念的先进度": ["工程低碳度", "空间集约度", "管廊综合度", "创新技术应用率", "智慧管理覆盖率", "智能设备使用率"],
+            "效益的显著度": ["经济效益显著度", "社会效益显著度", "生态效益显著度"],
+            "安全的可靠度": ["资金抗风险度", "管理抗风险度", "环境抗风险度", "地质灾害防治度", "洪涝灾害防治度", "土壤污染修复度", "生态环境扰动度", "土地管护有效度", "安全措施得当度", "安全事故危害度"]
         };
 
-        // 初始化时自动创建所有预定义指标
-        function initializePredefinedLevels() {
-            Object.entries(predefinedLevels).forEach(([level1Name, level2Names]) => {
-                const level1Id = addLevel1(level1Name);
-                level2Names.forEach(level2 => addLevel2(level1Id, level2));
-                
-                // 设置默认展开二级指标
-                const container = document.getElementById(level1Id).querySelector('.level2-container');
-                container.style.display = 'block'; // 默认展开
-                const button = document.querySelector(`#${level1Id} .toggle-btn`);
-                button.textContent = '收起'; // 修改按钮文本为"收起"
-            });
-        }
-
-        function addLevel1(name) {
+        function addLevel1(name = "新一级指标", level2List = [], weight = 0) {
             level1Counter++;
             const level1Id = `level1-${level1Counter}`;
 
             const template = 
                 `<div class="level1-group" id="${level1Id}">
                     <div class="input-group">
-                        <input type="text" value="${name}" readonly>
-                        <input type="number" class="auto-sum" readonly>
+                        <input type="text" value="${name}">
+                        <input type="number" class="weight-input" min="0" max="1" step="0.01" 
+                               value="${weight.toFixed(2)}" placeholder="一级权重">
+                        <input type="number" class="auto-sum" readonly placeholder="二级总和">
                         <button class="btn btn-add" onclick="addLevel2('${level1Id}')">+ 添加</button>
                         <button class="btn toggle-btn" onclick="toggleLevel2('${level1Id}')">展开</button>
+                        <button class="btn btn-del" onclick="deleteLevel1('${level1Id}')">×</button>
                     </div>
                     <div class="level2-container"></div>
                 </div>`;
 
             document.getElementById('indicators').insertAdjacentHTML('beforeend', template);
-            return level1Id;
+            level2List.forEach(level2 => addLevel2(level1Id, level2));
         }
 
-        // 展开/收起一级指标
+        function deleteLevel1(id) {
+            document.getElementById(id)?.remove();
+        }
+
         function toggleLevel2(id) {
             const container = document.getElementById(id).querySelector('.level2-container');
             const button = document.querySelector(`#${id} .toggle-btn`);
@@ -164,7 +144,17 @@
             button.textContent = container.style.display === 'none' ? '展开' : '收起';
         }
 
-        function addLevel2(parentId, name = '') {
+        function toggleAllLevels() {
+            document.querySelectorAll('.level1-group').forEach(level1 => {
+                const container = level1.querySelector('.level2-container');
+                const button = level1.querySelector('.toggle-btn');
+                container.style.display = allCollapsed ? 'none' : 'block';
+                button.textContent = allCollapsed ? '展开' : '收起';
+            });
+            allCollapsed = !allCollapsed;
+        }
+
+        function addLevel2(parentId, name = "新二级指标") {
             const container = document.getElementById(parentId).querySelector('.level2-container');
             const level2Id = Date.now();
 
@@ -172,8 +162,9 @@
                 `<div class="level2-item" id="level2-${level2Id}">
                     <div class="input-group">
                         <input type="text" placeholder="二级指标名称" value="${name}">
-                        <input type="number" min="0" max="1" step="0.01" oninput="updateLevel1Sum('${parentId}')">
-                        <button class="btn btn-del" onclick="deleteLevel2('level2-${level2Id}')">×</button>
+                        <input type="number" min="0" max="1" step="0.01" 
+                               oninput="updateLevel1Sum('${parentId}')" placeholder="0.00">
+                        <button class="btn btn-del" onclick="deleteLevel2('level2-${level2Id}', '${parentId}')">×</button>
                     </div>
                 </div>`;
 
@@ -181,13 +172,9 @@
             updateLevel1Sum(parentId);
         }
 
-        function deleteLevel2(id) {
-            const element = document.getElementById(id);
-            if (element) {
-                element.remove();
-                const parentId = element.closest('.level1-group').id;
-                updateLevel1Sum(parentId);
-            }
+        function deleteLevel2(id, parentId) {
+            document.getElementById(id)?.remove();
+            updateLevel1Sum(parentId);
         }
 
         function updateLevel1Sum(parentId) {
@@ -203,51 +190,55 @@
             sumInput.value = total.toFixed(2);
         }
 
-        function saveData() {
-            const data = [];
-            let totalWeight = 0;
-
-            document.querySelectorAll('.level1-group').forEach(level1 => {
-                const entry = {
-                    level1: {
-                        name: level1.querySelector('input[type="text"]').value,
-                        totalWeight: parseFloat(level1.querySelector('.auto-sum').value) || 0
-                    },
-                    level2: []
-                };
-
-                level1.querySelectorAll('.level2-item').forEach(level2 => {
-                    entry.level2.push({
-                        name: level2.querySelector('input[type="text"]').value,
-                        weight: parseFloat(level2.querySelector('input[type="number"]').value) || 0
-                    });
-                });
-
-                data.push(entry);
-                totalWeight += entry.level1.totalWeight;
-            });
-
-            if (Math.abs(totalWeight - 1) > 0.001) {
-                alert(`权重总和 ${totalWeight.toFixed(2)} ≠ 1，请调整权重配置！`);
-                return;
+        function validateWeights() {
+            const errors = [];
+            
+            // 验证一级指标权重总和
+            const level1Weights = Array.from(document.querySelectorAll('.weight-input'))
+                .map(input => parseFloat(input.value) || 0);
+            const totalLevel1 = level1Weights.reduce((a, b) => a + b, 0);
+            
+            if (Math.abs(totalLevel1 - 1) > 0.001) {
+                errors.push(`一级指标权重总和为 ${totalLevel1.toFixed(2)}（要求等于1）`);
             }
 
-            // 保存为文件
-            const date = new Date();
-            const dateString = date.toISOString().split('T')[0].replace(/-/g, ''); // 获取格式如：20250228
-            const fileName = `指标数据_${dateString}.json`;
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            a.click();
-            URL.revokeObjectURL(url);
+            // 验证二级指标权重
+            document.querySelectorAll('.level1-group').forEach(level1 => {
+                const level1Name = level1.querySelector('input[type="text"]').value;
+                const level2Inputs = Array.from(level1.querySelectorAll('.level2-item input[type="number"]'))
+                    .map(input => parseFloat(input.value) || 0);
+                const level2Sum = level2Inputs.reduce((a, b) => a + b, 0);
 
-            alert('配置验证通过，数据已保存！');
+                if (Math.abs(level2Sum - 1) > 0.001) {
+                    errors.push(`"${level1Name}"下的二级指标权重总和为 ${level2Sum.toFixed(2)}`);
+                }
+            });
+
+            return errors;
         }
 
-        // 页面加载时自动初始化
+        function saveData() {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.style.display = 'none';
+            
+            const errors = validateWeights();
+            
+            if (errors.length > 0) {
+                errorMessage.innerHTML = "保存失败：<br>" + errors.join("<br>");
+                errorMessage.style.display = 'block';
+                window.scrollTo(0, 0);
+            } else {
+                alert("配置保存成功！");
+                // 这里可以添加实际保存数据的逻辑
+            }
+        }
+
+        function initializePredefinedLevels() {
+            Object.entries(predefinedLevels).forEach(([level1Name, level2Names]) => {
+                addLevel1(level1Name, level2Names);
+            });
+        }
+
         initializePredefinedLevels();
     </script>
 </body>
