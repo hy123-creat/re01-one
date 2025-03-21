@@ -1,0 +1,1026 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>数据录入与结果评估系统</title>
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+           text-align: center; /* 标题居中 */
+        }
+        .factor {
+            border: 1px solid #ddd;
+            margin: 15px 0;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        .factor-header {
+            position: relative;
+            padding-right: 200px;
+            cursor: pointer;
+            background: #e3f2fd;
+            display: flex;
+            align-items: center;
+        }
+        .collapse-icon {
+            margin-right: 10px;
+            transition: transform 0.3s;
+        }
+        .collapsed .collapse-icon {
+            transform: rotate(-90deg);
+        }
+        .subfactors {
+            padding: 10px;
+            display: block;
+        }
+        .subfactor {
+            margin: 10px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .input-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        input {
+            width: 90px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: right;
+        }
+        .total-box {
+            background: #e8f5e9;
+            padding: 10px;
+            margin: 10px;
+            position: absolute;
+            right: 20px;
+        }
+        button {
+            background: #2196F3;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .validity-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .validity-group input[type="number"] {
+            width: 100px;
+            background: #f0f0f0;            
+        }
+                /* 新增样式 */
+                .planning-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .planning-group input[readonly] {
+            background: #f0f0f0;
+        }
+        #submitBtn {
+            display: block;
+            margin: 20px auto;
+        }
+        #results {
+            margin-top: 30px;
+            padding: 40px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .export-btn {
+            background: #4CAF50;
+        }
+        .deepseek-btn {
+            background: #9C27B0;
+        }
+        .calculation-group {
+            display: flex;
+            gap: 10px;
+        }
+        .calculation-group input[readonly] {
+            background: #f0f0f0;
+        }
+    </style>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>数据录入与结果评估系统</h1>
+        
+        <form id="evaluationForm">
+            <!-- 方案的完备度 -->
+            <div class="factor">
+                <div class="factor-header" onclick="toggleFactor(this)">
+                    <svg class="collapse-icon" width="12" height="12" viewBox="0 0 24 24">
+                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                    </svg>
+                    <h2>方案的完备度（总权重：15%）</h2>
+                    <div class="total-box">本指标得分：0.00</div>
+                </div>
+                <div class="subfactors">
+                    <div class="subfactor">
+                        <label>规划方案的合理性 <span class="weight">权重3%</span></label>
+                        <div class="validity-group">
+                            <input type="number" class="validity-input" 
+                                   data-weight="0.03" 
+                                   min="0" max="100" 
+                                   list="validScores"
+                                   oninput="validateValidity(this)">
+                            <input type="number" class="weighted" readonly placeholder="权重得分">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>实施方案的合理性 <span class="weight">权重3%</span></label>
+                        <div class="validity-group">
+                            <input type="number" class="validity-input" 
+                                   data-weight="0.03" 
+                                   min="0" max="100" 
+                                   list="validScores"
+                                   oninput="validateValidity(this)">
+                            <input type="number" class="weighted" readonly placeholder="权重得分">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>管理方案的合理性 <span class="weight">权重3%</span></label>
+                        <div class="validity-group">
+                            <input type="number" class="validity-input" 
+                                   data-weight="0.03" 
+                                   min="0" max="100" 
+                                   list="validScores"
+                                   oninput="validateValidity(this)">
+                            <input type="number" class="weighted" readonly placeholder="权重得分">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>供地方案的合理性 <span class="weight">权重3%</span></label>
+                        <div class="validity-group">
+                            <input type="number" class="validity-input" 
+                                   data-weight="0.03" 
+                                   min="0" max="100" 
+                                   list="validScores"
+                                   oninput="validateValidity(this)">
+                            <input type="number" class="weighted" readonly placeholder="权重得分">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>招商方案的合理性 <span class="weight">权重3%</span></label>
+                        <div class="validity-group">
+                            <input type="number" class="validity-input" 
+                                   data-weight="0.03" 
+                                   min="0" max="100" 
+                                   list="validScores"
+                                   oninput="validateValidity(this)">
+                            <input type="number" class="weighted" readonly placeholder="权重得分">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <!-- 添加有效分值选项 -->
+        <datalist id="validScores">
+            <option value="0">
+            <option value="50">
+            <option value="70">
+            <option value="100">
+        </datalist>
+            <!-- 工作的衔接度 -->
+            <div class="factor">
+                <div class="factor-header" onclick="toggleFactor(this)">
+                    <svg class="collapse-icon" width="12" height="12" viewBox="0 0 24 24">
+                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                    </svg>
+                    <h2>工作的衔接度（总权重：18%）</h2>
+                    <div class="total-box">本指标得分：0.00</div>
+                </div>
+                <div class="subfactors">
+                    <!-- 修改后的前序工作干扰度 -->
+                    <div class="subfactor">
+                        <label>前序工作的干扰度 <span class="weight">权重3%</span></label>
+                        <div class="calculation-group">
+                            <input type="number" data-custom="disputeDays" placeholder="纠纷天数" min="0">
+                            <input type="number" data-custom="totalDays" placeholder="总天数" min="1">
+                            <input type="number" data-custom="calculated" readonly placeholder="得分" step="0.01">
+                            <input type="number" data-custom="weighted" data-weight="0.03" readonly placeholder="权重得分" step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>相关规划衔接度 <span class="weight">权重3%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.03"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>资金保障的可靠度 <span class="weight">权重3%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.03"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+                                   onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>部门间的衔接度 <span class="weight">权重3%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.03"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>工序间的衔接度 <span class="weight">权重3%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.03"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>审批结果合格性 <span class="weight">权重3%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.03"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!—质量的卓越性 -->
+            <div class="factor">
+                <div class="factor-header" onclick="toggleFactor(this)">
+                    <svg class="collapse-icon" width="12" height="12" viewBox="0 0 24 24">
+                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                    </svg>
+                    <h2>质量的卓越性（总权重：26%）</h2>
+                    <div class="total-box">本指标得分：0.00</div>
+                </div>
+                <div class="subfactors">
+                    <div class="subfactor">
+                        <label>道路体系成熟度 <span class="weight">权重3%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.03"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>给水保障度 <span class="weight">权重3%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.03"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>排水保障度 <span class="weight">权重3%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.03"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>供电保障度 <span class="weight">权重3%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.03"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>供暖保障度 <span class="weight">权重2%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.02"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>燃气保障度 <span class="weight">权重3%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.03"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>通讯保障度 <span class="weight">权重3%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.03"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>场地平整度 <span class="weight">权重3%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.03"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>土方平衡度 <span class="weight">权重3%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.03"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!—理念先进度 -->
+            <div class="factor">
+                <div class="factor-header" onclick="toggleFactor(this)">
+                    <svg class="collapse-icon" width="12" height="12" viewBox="0 0 24 24">
+                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                    </svg>
+                    <h2>理念先进度（总权重：12%）</h2>
+                    <div class="total-box">本指标得分：0.00</div>
+                </div>
+                <div class="subfactors">
+                    <div class="subfactor">
+                        <label>工程低碳度 <span class="weight">权重2%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.02"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>空间集约度 <span class="weight">权重2%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.02"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>管廊综合度 <span class="weight">权重2%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.02"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>创新技术应用率<span class="weight">权重2%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.02"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>智慧管理覆盖率 <span class="weight">权重2%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.02"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>智能设备使用率 <span class="weight">权重2%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.02"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>    
+                </div>
+            </div>
+
+            <!—效益的显著度 -->
+            <div class="factor">
+                <div class="factor-header" onclick="toggleFactor(this)">
+                    <svg class="collapse-icon" width="12" height="12" viewBox="0 0 24 24">
+                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                    </svg>
+                    <h2>效益的显著度（总权重：9%）</h2>
+                    <div class="total-box">本指标得分：0.00</div>
+                </div>
+                <div class="subfactors">
+                    <div class="subfactor">
+                        <label>经济效益显著度 <span class="weight">权重3%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.03"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>社会效益显著度 <span class="weight">权重3%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.03"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>生态效益显著度 <span class="weight">权重3%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.03"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!—安全的可靠度 -->
+            <div class="factor">
+                <div class="factor-header" onclick="toggleFactor(this)">
+                    <svg class="collapse-icon" width="12" height="12" viewBox="0 0 24 24">
+                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                    </svg>
+                    <h2>安全的可靠度（总权重：20%）</h2>
+                    <div class="total-box">本指标得分：0.00</div>
+                </div>
+                <div class="subfactors">
+                    <div class="subfactor">
+                        <label>管理抗风险度 <span class="weight">权重3%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.03"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>地质灾害防治度<span class="weight">权重3%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.03"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>洪涝灾害防治度 <span class="weight">权重3%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.03"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>土壤污染修复度 <span class="weight">权重3%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.03"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>生态环境扰动度 <span class="weight">权重2%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.02"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>土地管理有效度 <span class="weight">权重2%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.02"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>安全措施得当度 <span class="weight">权重2%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.02"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    <div class="subfactor">
+                        <label>安全事故危害度 <span class="weight">权重2%</span></label>
+                        <div class="planning-group">
+                            <input type="number" 
+                                   data-weight="0.02"
+                                   data-formula="direct" 
+                                   placeholder="总分"
+                                   min="0" max="100"
+                                   step="0.01"
+               onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46">
+                            <input type="number" 
+                                   data-custom="weighted" 
+                                   readonly 
+                                   placeholder="权重得分"
+                                   step="0.01">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit">计算综合评分</button>
+        </form>
+
+        <div id="results">
+            <div id="factorScores"></div>
+            <div id="totalScore"></div>
+        </div>
+                <!-- 新增按钮容器 -->
+                <div class="action-buttons">
+                    <button type="button" class="export-btn" onclick="exportToExcel()">导出Excel</button>
+                    <button type="button" class="deepseek-btn" onclick="gotoDeepseek()">深度分析</button>
+                </div>
+    </div>
+
+    <script>
+        // 展开/收起功能
+        function toggleFactor(header) {
+            const factor = header.parentElement;
+            factor.classList.toggle('collapsed');
+            const subfactors = factor.querySelector('.subfactors');
+            subfactors.style.display = factor.classList.contains('collapsed') ? 'none' : 'block';
+        }
+    
+        // 通用指标得分计算函数
+        function calculateFactorTotal(factor) {
+            let total = 0;
+            
+            // 查找当前指标下所有类型的权重得分输入框
+            factor.querySelectorAll('[data-custom="weighted"], .weighted').forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+    
+            // 更新指标总分显示
+            const totalBox = factor.querySelector('.total-box');
+            if(totalBox) {
+                totalBox.textContent = `本指标得分：${total.toFixed(2)}`;
+                totalBox.style.color = total > 0 ? '#2e7d32' : '#d32f2f';
+            }
+        }
+    
+        // === 各类型输入处理函数 ===
+        // 1. 方案完备度专用验证
+        function validateValidity(input) {
+            const validValues = [0, 50, 70, 100];
+            const value = parseInt(input.value);
+    
+            if (!validValues.includes(value)) {
+                alert("请输入有效分值（0、50、70、100）");
+                input.value = input.dataset.lastValid || "0";
+                return;
+            }
+    
+            input.dataset.lastValid = value;
+            const parent = input.closest('.subfactor');
+            const weighted = parent.querySelector('.weighted');
+            weighted.value = (value * parseFloat(input.dataset.weight)).toFixed(2);
+            
+            calculateFactorTotal(input.closest('.factor'));
+        }
+    
+        // 2. 前序工作干扰度计算
+        function calculateInterference(input) {
+            const parent = input.closest('.subfactor');
+            const disputeDays = parseFloat(parent.querySelector('[data-custom="disputeDays"]').value) || 0;
+            const totalDays = parseFloat(parent.querySelector('[data-custom="totalDays"]').value) || 1;
+            const calculated = ((totalDays - disputeDays) / totalDays) * 100;
+    
+            parent.querySelector('[data-custom="calculated"]').value = calculated.toFixed(1);
+            const weighted = calculated * 0.03; // 权重3%
+            parent.querySelector('[data-custom="weighted"]').value = weighted.toFixed(2);
+            
+            calculateFactorTotal(input.closest('.factor'));
+        }
+    
+        // 3. 直接计算类型处理
+        function calculateDirectScore(input) {
+            const parent = input.closest('.subfactor');
+            const value = parseFloat(input.value) || 0;
+            const weight = parseFloat(input.dataset.weight);
+            const weighted = parent.querySelector('[data-custom="weighted"]');
+            
+            weighted.value = (value * weight).toFixed(2);
+            calculateFactorTotal(input.closest('.factor'));
+        }
+    
+        // === 事件监听 ===
+        // 绑定所有输入类型
+        document.querySelectorAll('input').forEach(input => {
+            // 方案完备度专用验证
+            if(input.classList.contains('validity-input')) {
+                input.addEventListener('input', () => validateValidity(input));
+            }
+            // 前序工作干扰度计算
+            else if(input.dataset.custom === 'disputeDays' || input.dataset.custom === 'totalDays') {
+                input.addEventListener('input', () => calculateInterference(input));
+            }
+            // 直接计算类型
+            else if(input.dataset.formula === 'direct') {
+                input.addEventListener('input', () => calculateDirectScore(input));
+            }
+        });
+    
+        // === 初始化计算 ===
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.factor').forEach(factor => {
+                calculateFactorTotal(factor);
+            });
+        });
+    
+        // === 综合评分计算 ===
+        document.getElementById('evaluationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let totalScore = 0;
+            const results = [];
+    
+            document.querySelectorAll('.factor').forEach(factor => {
+                const factorName = factor.querySelector('h2').textContent;
+                const scoreText = factor.querySelector('.total-box').textContent;
+                const factorScore = parseFloat(scoreText.replace('本指标得分：', '')) || 0;
+    
+                totalScore += factorScore;
+                results.push(`
+                    <div class="factor-result">
+                        <h3>${factorName}</h3>
+                        <div>小计：${factorScore.toFixed(2)}</div>
+                    </div>
+                `);
+            });
+    
+            document.getElementById('factorScores').innerHTML = results.join('');
+            document.getElementById('totalScore').innerHTML = `<h3>总评分：${totalScore.toFixed(2)}</h3>`;
+        });
+                // 综合评分计算（增加二级指标详情）
+                document.getElementById('evaluationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let totalScore = 0;
+            const results = [];
+            
+            document.querySelectorAll('.factor').forEach(factor => {
+                const factorName = factor.querySelector('h2').textContent;
+                let factorScore = 0;
+                let subItems = [];
+                
+                // 遍历所有输入项
+                factor.querySelectorAll('.subfactor').forEach(sub => {
+                    const label = sub.querySelector('label').textContent;
+                    let score = 0;
+                    
+                    // 不同类型处理
+                    if(sub.querySelector('.validity-group')) {
+                        score = parseFloat(sub.querySelector('.weighted').value) || 0;
+                    }
+                    else if(sub.querySelector('.calculation-group')) {
+                        score = parseFloat(sub.querySelector('[data-custom="weighted"]').value) || 0;
+                    }
+                    else {
+                        score = parseFloat(sub.querySelector('[data-custom="weighted"]').value) || 0;
+                    }
+                    
+                    subItems.push(`<div>${label}：${score.toFixed(2)}</div>`);
+                    factorScore += score;
+                });
+
+                totalScore += factorScore;
+                results.push(`
+                    <div class="factor-result">
+                        <h3>${factorName}</h3>
+                        ${subItems.join('')}
+                        <div style="margin-top:8px;font-weight:bold">小计：${factorScore.toFixed(2)}</div>
+                    </div>
+                `);
+            });
+
+            document.getElementById('factorScores').innerHTML = results.join('');
+            document.getElementById('totalScore').innerHTML = `<h3 style="color:#2196F3">总评分：${totalScore.toFixed(2)}</h3>`;
+        });
+
+        // 导出Excel功能
+        function exportToExcel() {
+            const data = [];
+            
+            // 收集数据
+            document.querySelectorAll('.factor').forEach(factor => {
+                const factorName = factor.querySelector('h2').textContent;
+                factor.querySelectorAll('.subfactor').forEach(sub => {
+                    const row = {
+                        '一级指标': factorName,
+                        '二级指标': sub.querySelector('label').textContent.replace(/\s+/g, ' '),
+                        '得分': parseFloat(sub.querySelector('[data-custom="weighted"], .weighted').value) || 0
+                    };
+                    data.push(row);
+                });
+            });
+
+            // 创建工作簿
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "评估结果");
+            
+            // 生成文件名
+            const today = new Date();
+            const dateString = 
+                String(today.getMonth() + 1).padStart(2, '0') + 
+                String(today.getDate()).padStart(2, '0');
+            
+            // 导出文件
+            XLSX.writeFile(wb, `整治得分_${dateString}.xlsx`);
+        }
+
+        // 跳转Deepseek
+        function gotoDeepseek() {
+            window.location.href = 'https://chat.deepseek.com/';
+        }
+    </script>
+</body>
+</html>
