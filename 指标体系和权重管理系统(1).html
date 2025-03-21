@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>指标体系和权重管理系统</title>
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        h1 {
+            text-align: center;
+        }
+        .level1-group {
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background: #f8f9fa;
+            position: relative;
+        }
+        .toggle-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .level2-container {
+            display: none;
+        }
+        .level2-item {
+            margin: 10px 0 10px 30px;
+            padding: 10px;
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+        }
+        input[type="text"] {
+            width: 200px;
+            padding: 6px;
+        }
+        input[type="number"] {
+            width: 100px;
+            padding: 6px;
+        }
+        .auto-sum {
+            background: #e9ecef;
+            cursor: not-allowed;
+        }
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-add {
+            background: #28a745;
+            color: white;
+        }
+        .btn-del {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-toggle-all {
+            background: #007bff;
+            color: white;
+            margin-bottom: 10px;
+        }
+        .weight-input {
+            background: #fff3cd;
+        }
+        .error-message {
+            color: #dc3545;
+            margin: 10px 0;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>指标体系和权重管理系统</h1>
+        <div class="error-message" id="errorMessage"></div>
+
+        <button class="btn btn-toggle-all" onclick="toggleAllLevels()">全部收起</button>
+        <button class="btn btn-add" onclick="addLevel1()">+ 添加一级指标</button>
+
+        <div id="indicators"></div>
+
+        <div style="margin-top: 20px;">
+            <button class="btn btn-add" onclick="saveData()">保存配置</button>
+        </div>
+    </div>
+    <script>
+        let level1Counter = 0;
+        let allCollapsed = true;
+
+        const predefinedLevels = {
+            "方案的完备度": ["规划方案的合理性", "实施方案的合理性", "管理方案的合理性", "供地方案的合理性", "招商方案的合理性"],
+            "工作的衔接度": ["前序工作的干扰度", "相关规划的衔接度", "资金保障的可靠度", "部门间的衔接度", "施工工序的衔接度", "审批结果合格性"],
+            "质量的卓越性": ["道路体系成熟度", "给水保障度", "排水保障度", "供电保障度", "供暖保障度", "燃气保障度", "通讯保障度", "场地平整完成度", "土方平衡度"],
+            "理念的先进度": ["工程低碳度", "空间集约度", "管廊综合度", "创新技术应用率", "智慧管理覆盖率", "智能设备使用率"],
+            "效益的显著度": ["经济效益显著度", "社会效益显著度", "生态效益显著度"],
+            "安全的可靠度": ["管理抗风险度", "地质灾害防治度", "洪涝灾害防治度", "土壤污染修复度", "生态环境扰动度", "土地管护有效度", "安全措施得当度", "安全事故危害度"]
+        };
+        // 一级指标的提示范围映射
+        const level1PlaceholderMap = {
+            "方案的完备度": "0.15-0.20",
+            "工作的衔接度": "0.12-0.18",
+            "质量的卓越性": "0.18-0.22",
+            "理念的先进度": "0.08-0.12",
+            "效益的显著度": "0.12-0.18",
+            "安全的可靠度": "0.20-0.25"
+        };
+
+        function addLevel1(name = "新一级指标", level2List = [], weight = 0) {
+            level1Counter++;
+            const level1Id = `level1-${level1Counter}`;
+            const placeholder = level1PlaceholderMap[name] || "0.00";
+
+            const template = 
+                `<div class="level1-group" id="${level1Id}">
+                    <div class="input-group">
+                        <input type="text" value="${name}">
+                        <input type="number" class="weight-input" min="0" max="1" step="0.01" 
+                                  placeholder="${placeholder}"
+                          oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+                        <input type="number" class="auto-sum" readonly placeholder="二级总和">
+                        <button class="btn btn-add" onclick="addLevel2('${level1Id}')">+ 添加</button>
+                        <button class="btn toggle-btn" onclick="toggleLevel2('${level1Id}')">展开</button>
+                        <button class="btn btn-del" onclick="deleteLevel1('${level1Id}')">×</button>
+                    </div>
+                    <div class="level2-container"></div>
+                </div>`;
+                
+            document.getElementById('indicators').insertAdjacentHTML('beforeend', template);
+            level2List.forEach(level2 => addLevel2(level1Id, level2));
+        }
+
+        function deleteLevel1(id) {
+            document.getElementById(id)?.remove();
+        }
+
+        function toggleLevel2(id) {
+            const container = document.getElementById(id).querySelector('.level2-container');
+            const button = document.querySelector(`#${id} .toggle-btn`);
+            container.style.display = container.style.display === 'none' ? 'block' : 'none';
+            button.textContent = container.style.display === 'none' ? '展开' : '收起';
+        }
+
+        function toggleAllLevels() {
+            document.querySelectorAll('.level1-group').forEach(level1 => {
+                const container = level1.querySelector('.level2-container');
+                const button = level1.querySelector('.toggle-btn');
+                container.style.display = allCollapsed ? 'none' : 'block';
+                button.textContent = allCollapsed ? '展开' : '收起';
+            });
+            allCollapsed = !allCollapsed;
+        }
+        // 1. 映射表：存放二级指标和对应的权重范围提示
+        const placeholderMap = {
+            "规划方案的合理性": "0.25-0.35",
+            "实施方案的合理性": "0.20-0.30",
+            "管理方案的合理性": "0.08-0.12",
+            "供地方案的合理性": "0.15-0.25",
+            "招商方案的合理性": "0.10-0.20",
+            "前序工作的干扰度": "0.08-0.12",
+            "相关规划的衔接度": "0.25-0.35",
+            "审批结果合格性": "0.15-0.20",
+            "资金保障的可靠度": "0.20-0.25",
+            "部门间的衔接度": "0.15-0.20",
+            "施工工序的衔接度": "0.10-0.15",
+            "道路体系成熟度": "0.15-0.20",
+            "给水保障度": "0.10-0.15",
+            "排水保障度": "0.10-0.15",
+            "供电保障度": "0.10-0.15",
+            "供暖保障度": "0.08-0.12",
+            "燃气保障度": "0.08-0.12",
+            "通讯保障度": "0.05-0.08",
+            "场地平整完成度": "0.05-0.10",
+            "土方平衡度": "0.08-0.12",
+            "工程低碳度": "0.25-0.35",
+            "空间集约度": "0.20-0.30",
+            "管廊综合度": "0.15-0.25",
+            "创新技术应用率": "0.10-0.20",
+            "智慧管理覆盖率": "0.05-0.10",
+            "智能设备使用率": "0.05-0.10",
+            "经济效益显著度": "0.30-0.40",
+            "社会效益显著度": "0.25-0.35",
+            "生态效益显著度": "0.35-0.45",
+            "管理抗风险度": "0.12-0.18",
+            "地质灾害防治度": "0.20-0.30",
+            "洪涝灾害防治度": "0.12-0.18",
+            "土壤污染修复度": "0.18-0.25",
+            "生态环境扰动度": "0.08-0.12",
+            "土地管护有效度": "0.10-0.15",
+            "安全措施得当度": "0.12-0.18",
+            "安全事故危害度": "0.05-0.10",
+        };
+        function addLevel2(parentId, name = "新二级指标") {
+            const container = document.getElementById(parentId).querySelector('.level2-container');
+            const level2Id = Date.now();
+            // 3. 根据指标名称获取提示范围，如果找不到就默认 "0.00"
+            const placeholder = placeholderMap[name] || "0.00";
+            const template = 
+                `<div class="level2-item" id="level2-${level2Id}">
+                    <div class="input-group">
+                        <input type="text" placeholder="二级指标名称" value="${name}">
+                        <input type="number" min="0" max="1" step="0.01" 
+                                                      placeholder="${placeholder}"
+                       oninput="updateLevel1Sum('${parentId}')">
+                <button class="btn btn-del" onclick="deleteLevel2('level2-${level2Id}', '${parentId}')">×</button>
+            </div>
+        </div>`;
+
+            container.insertAdjacentHTML('beforeend', template);
+            updateLevel1Sum(parentId);
+        }
+
+        function deleteLevel2(id, parentId) {
+            document.getElementById(id)?.remove();
+            updateLevel1Sum(parentId);
+        }
+
+        function updateLevel1Sum(parentId) {
+            const level1 = document.getElementById(parentId);
+            const inputs = level1.querySelectorAll('.level2-item input[type="number"]');
+            const sumInput = level1.querySelector('.auto-sum');
+
+            let total = 0;
+            inputs.forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+
+            sumInput.value = total.toFixed(2);
+        }
+
+        function validateWeights() {
+            const errors = [];
+            
+            // 验证一级指标权重总和
+            const level1Weights = Array.from(document.querySelectorAll('.weight-input'))
+                .map(input => parseFloat(input.value) || 0);
+            const totalLevel1 = level1Weights.reduce((a, b) => a + b, 0);
+            
+            if (Math.abs(totalLevel1 - 1) > 0.001) {
+                errors.push(`一级指标权重总和为 ${totalLevel1.toFixed(2)}（要求等于1）`);
+            }
+
+            // 验证二级指标权重
+            document.querySelectorAll('.level1-group').forEach(level1 => {
+                const level1Name = level1.querySelector('input[type="text"]').value;
+                const level2Inputs = Array.from(level1.querySelectorAll('.level2-item input[type="number"]'))
+                    .map(input => parseFloat(input.value) || 0);
+                const level2Sum = level2Inputs.reduce((a, b) => a + b, 0);
+
+                if (Math.abs(level2Sum - 1) > 0.001) {
+                    errors.push(`"${level1Name}"下的二级指标权重总和为 ${level2Sum.toFixed(2)}`);
+                }
+            });
+
+            return errors;
+        }
+
+        function saveData() {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.style.display = 'none';
+            
+            const errors = validateWeights();
+            
+            if (errors.length > 0) {
+                errorMessage.innerHTML = "保存失败：<br>" + errors.join("<br>");
+                errorMessage.style.display = 'block';
+                window.scrollTo(0, 0);
+            } else {
+                alert("配置保存成功！");
+                // 这里可以添加实际保存数据的逻辑
+            }
+        }
+
+        function initializePredefinedLevels() {
+            Object.entries(predefinedLevels).forEach(([level1Name, level2Names]) => {
+                addLevel1(level1Name, level2Names);
+            });
+        }
+
+        initializePredefinedLevels();
+    </script>
+</body>
+</html>
