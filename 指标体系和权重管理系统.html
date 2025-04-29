@@ -130,7 +130,7 @@
                 <input type="text" value="${name}">
                 <input type="number" class="weight-input" min="0" max="1" step="0.01" 
                           placeholder="${placeholder}"
-                  oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+                  oninput="validateDecimalInput(this)">
                 <input type="number" class="auto-sum" readonly placeholder="二级总和">
                 <button class="btn toggle-btn" onclick="toggleLevel2('${level1Id}')">展开</button>
                 <button class="btn btn-del" onclick="deleteLevel1('${level1Id}')">×删除一级指标</button>
