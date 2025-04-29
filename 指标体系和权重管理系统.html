@@ -118,7 +118,24 @@
             "效益的显著度": "0.13-0.16",
             "安全的可靠度": "0.18-0.24"
         };
+function validateDecimalInput(input) {
+    let value = input.value;
 
+    // 允许只输入 "0", "0.", "0.1" 这种形式
+    // 只保留数字和一个小数点
+    value = value.replace(/[^0-9.]/g, '');
+
+    // 防止多个小数点
+    const parts = value.split('.');
+    if (parts.length > 2) {
+        value = parts[0] + '.' + parts.slice(1).join('');
+    }
+
+    // 暂时不强制转换为浮点数，以允许像 "0." 这样的中间状态
+    // 仅在失焦或提交时再进行严格校验
+
+    input.value = value;
+}
         function addLevel1(name = "新一级指标", level2List = [], weight = 0) {
     level1Counter++;
     const level1Id = `level1-${level1Counter}`;
