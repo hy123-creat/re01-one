@@ -145,67 +145,85 @@
                     <div class="subfactor">
                         <label>规划方案的合理性 <span class="weight">权重3%</span></label>
                         <div class="validity-group">
-                            <input type="number" class="validity-input" 
-                                   data-weight="0.03" 
-                                   min="0" max="100" 
-                                   list="validScores"
-                                   oninput="validateValidity(this)">
-                            <input type="number" class="weighted" readonly placeholder="权重得分">
+                            <!-- 选择框，带有文字说明 -->
+                            <select class="validity-input" data-weight="0.03" onchange="updateWeightedScore(this)">
+                                <option value="">请选择评分</option> 
+                                <option value="0">0 - 无规划方案</option>
+                                <option value="50">50 - 规划方案基本可行</option>
+                                <option value="70">70 - 规划方案合理性较强</option>
+                                <option value="100">100 - 规划方案合理性强</option>
+                            </select>
+                            
+                            <!-- 计加权得分 -->
+                            <input type="number" class="weighted" readonly placeholder="加权得分">
                         </div>
                     </div>
                     <div class="subfactor">
                         <label>实施方案的合理性 <span class="weight">权重3%</span></label>
                         <div class="validity-group">
-                            <input type="number" class="validity-input" 
-                                   data-weight="0.03" 
-                                   min="0" max="100" 
-                                   list="validScores"
-                                   oninput="validateValidity(this)">
-                            <input type="number" class="weighted" readonly placeholder="权重得分">
+                            <!-- 选择框，带有文字说明 -->
+                            <select class="validity-input" data-weight="0.03" onchange="updateWeightedScore(this)">
+                                <option value="">请选择评分</option> 
+                                <option value="0">0 - 无实施方案</option>
+                                <option value="50">50 - 实施方案基本可行</option>
+                                <option value="70">70 - 实施方案合理性较强</option>
+                                <option value="100">100 - 实施方案合理性强</option>
+                            </select>
+                            
+                            <!-- 计加权得分 -->
+                            <input type="number" class="weighted" readonly placeholder=加权得分>
                         </div>
                     </div>
                     <div class="subfactor">
                         <label>管理方案的合理性 <span class="weight">权重3%</span></label>
                         <div class="validity-group">
-                            <input type="number" class="validity-input" 
-                                   data-weight="0.03" 
-                                   min="0" max="100" 
-                                   list="validScores"
-                                   oninput="validateValidity(this)">
-                            <input type="number" class="weighted" readonly placeholder="权重得分">
+                            <!-- 选择框，带有文字说明 -->
+                            <select class="validity-input" data-weight="0.03" onchange="updateWeightedScore(this)">
+                                <option value="">请选择评分</option> 
+                                <option value="0">0 - 无管理方案</option>
+                                <option value="50">50 - 管理方案基本可行</option>
+                                <option value="70">70 - 管理方案合理性较强</option>
+                                <option value="100">100 - 管理方案合理性强</option>
+                            </select>
+                            
+                            <!-- 计加权得分 -->
+                            <input type="number" class="weighted" readonly placeholder=加权得分>
                         </div>
                     </div>
                     <div class="subfactor">
                         <label>供地方案的合理性 <span class="weight">权重3%</span></label>
                         <div class="validity-group">
-                            <input type="number" class="validity-input" 
-                                   data-weight="0.03" 
-                                   min="0" max="100" 
-                                   list="validScores"
-                                   oninput="validateValidity(this)">
-                            <input type="number" class="weighted" readonly placeholder="权重得分">
+                            <!-- 选择框，带有文字说明 -->
+                            <select class="validity-input" data-weight="0.03" onchange="updateWeightedScore(this)">
+                                <option value="">请选择评分</option> 
+                                <option value="0">0 - 无供地方案</option>
+                                <option value="50">50 - 供地方案基本可行</option>
+                                <option value="70">70 - 供地方案合理性较强</option>
+                                <option value="100">100 - 供地方案合理性强</option>
+                            </select>
+                            
+                            <!-- 计加权得分 -->
+                            <input type="number" class="weighted" readonly placeholder=加权得分>
                         </div>
                     </div>
                     <div class="subfactor">
                         <label>招商方案的合理性 <span class="weight">权重3%</span></label>
                         <div class="validity-group">
-                            <input type="number" class="validity-input" 
-                                   data-weight="0.03" 
-                                   min="0" max="100" 
-                                   list="validScores"
-                                   oninput="validateValidity(this)">
-                            <input type="number" class="weighted" readonly placeholder="权重得分">
+                            <!-- 选择框，带有文字说明 -->
+                            <select class="validity-input" data-weight="0.03" onchange="updateWeightedScore(this)">
+                                <option value="">请选择评分</option> 
+                                <option value="0">0 - 无招商方案</option>
+                                <option value="50">50 - 招商方案基本可行</option>
+                                <option value="70">70 - 招商方案合理性较强</option>
+                                <option value="100">100 - 招商方案合理性强</option>
+                            </select>
+                            
+                            <!-- 计加权得分 -->
+                            <input type="number" class="weighted" readonly placeholder=加权得分>
                         </div>
                     </div>
                 </div>
             </div>
-        <!-- 添加有效分值选项 -->
-        <datalist id="validScores">
-            <option value="0">
-            <option value="50">
-            <option value="70">
-            <option value="100">
-        </datalist>
             <!-- 工作的衔接度 -->
             <div class="factor">
                 <div class="factor-header" onclick="toggleFactor(this)">
@@ -220,10 +238,16 @@
                     <div class="subfactor">
                         <label>前序工作的干扰度 <span class="weight">权重3%</span></label>
                         <div class="calculation-group">
-                            <input type="number" data-custom="disputeDays" placeholder="纠纷天数" min="0">
-                            <input type="number" data-custom="totalDays" placeholder="总天数" min="1">
+                            <span style="font-size: 16px; color: #242424; max-width: 400px; line-height: 2;">
+                                纠纷天数：
+                            </span>
+                            <input type="number" data-custom="disputeDays" placeholder="天数" min="0">
+                            <span style="font-size: 16px; color: #242424; max-width: 400px; line-height: 2;">
+                                施工总天数：
+                            </span>
+                            <input type="number" data-custom="totalDays" placeholder="天数" min="1">
                             <input type="number" data-custom="calculated" readonly placeholder="得分" step="0.01">
-                            <input type="number" data-custom="weighted" data-weight="0.03" readonly placeholder="权重得分" step="0.01">
+                            <input type="number" data-custom="weighted" data-weight="0.03" readonly placeholder=加权得分 step="0.01">
                         </div>
                     </div>
                     <div class="subfactor">
@@ -239,7 +263,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -256,7 +280,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -273,7 +297,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -290,7 +314,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -307,25 +331,25 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!—质量的卓越性 -->
+            <!—工程的保障度 -->
             <div class="factor">
                 <div class="factor-header" onclick="toggleFactor(this)">
                     <svg class="collapse-icon" width="12" height="12" viewBox="0 0 24 24">
                         <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
                     </svg>
-                    <h2>质量的卓越性（总权重：26%）</h2>
+                    <h2>工程的保障度（总权重：26%）</h2>
                     <div class="total-box">本指标得分：0.00</div>
                 </div>
                 <div class="subfactors">
                     <div class="subfactor">
-                        <label>道路体系成熟度 <span class="weight">权重3%</span></label>
+                        <label>交通保障度 <span class="weight">权重3%</span></label>
                         <div class="planning-group">
                             <input type="number" 
                                    data-weight="0.03"
@@ -337,7 +361,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -354,7 +378,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -371,7 +395,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -388,7 +412,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -405,7 +429,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -422,7 +446,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -439,7 +463,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -456,7 +480,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -473,7 +497,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -503,7 +527,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -520,7 +544,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -537,7 +561,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -554,7 +578,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -571,7 +595,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -588,7 +612,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>    
@@ -618,7 +642,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -635,7 +659,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -652,7 +676,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -682,7 +706,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -699,7 +723,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -716,7 +740,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -733,7 +757,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -750,7 +774,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -767,7 +791,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -784,7 +808,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -801,7 +825,7 @@
                             <input type="number" 
                                    data-custom="weighted" 
                                    readonly 
-                                   placeholder="权重得分"
+                                   placeholder=加权得分
                                    step="0.01">
                         </div>
                     </div>
@@ -817,9 +841,14 @@
         </div>
                 <!-- 新增按钮容器 -->
                 <div class="action-buttons">
-                    <button type="button" class="export-btn" onclick="exportToExcel()">导出Excel</button>
+                    <button class="btn btn-add" onclick="exportToExcel()">导出Excel</button>
                     <button type="button" class="deepseek-btn" onclick="gotoDeepseek()">深度分析</button>
+                        <!-- 提示文字 -->
+                    <span style="font-size: 14px; color: #555; max-width: 400px; line-height: 1.5;">
+                        请将导出的 Excel 表和以下文字：每一项指标实际得分的总分均为 100 分，请总结得分的总体情况，分项情况，以及如何改进整治工作，能够使得整治得分更高。输入到deepseek的对话框。
+                    </span>
                 </div>
+                
     </div>
 
     <script>
@@ -835,7 +864,7 @@
         function calculateFactorTotal(factor) {
             let total = 0;
             
-            // 查找当前指标下所有类型的权重得分输入框
+            // 查找当前指标下所有类型加权得分输入框
             factor.querySelectorAll('[data-custom="weighted"], .weighted').forEach(input => {
                 total += parseFloat(input.value) || 0;
             });
@@ -849,25 +878,19 @@
         }
     
         // === 各类型输入处理函数 ===
-        // 1. 方案完备度专用验证
-        function validateValidity(input) {
-            const validValues = [0, 50, 70, 100];
-            const value = parseInt(input.value);
-    
-            if (!validValues.includes(value)) {
-                alert("请输入有效分值（0、50、70、100）");
-                input.value = input.dataset.lastValid || "0";
-                return;
-            }
-    
-            input.dataset.lastValid = value;
-            const parent = input.closest('.subfactor');
-            const weighted = parent.querySelector('.weighted');
-            weighted.value = (value * parseFloat(input.dataset.weight)).toFixed(2);
-            
-            calculateFactorTotal(input.closest('.factor'));
+        function updateWeightedScore(select) {
+            const weight = parseFloat(select.dataset.weight); // 获取权重
+            const selectedOption = select.options[select.selectedIndex]; // 获取选中的 option 元素
+            const score = selectedOption.value; // 获取数字部分，只有 value 部分
+            const weightedScore = score ? (parseFloat(score) * weight).toFixed(2) : ""; // 计算得分
+
+            const weightedInput = select.closest('.validity-group').querySelector('.weighted'); // 找到对应加权得分输入框
+            weightedInput.value = weightedScore; // 设置计算后的得分，仅显示数字
+                // **立即更新一级指标得分**
+            calculateFactorTotal(select.closest('.factor'));
         }
-    
+        
+ 
         // 2. 前序工作干扰度计算
         function calculateInterference(input) {
             const parent = input.closest('.subfactor');
@@ -987,35 +1010,89 @@
 
         // 导出Excel功能
         function exportToExcel() {
-            const data = [];
-            
-            // 收集数据
-            document.querySelectorAll('.factor').forEach(factor => {
-                const factorName = factor.querySelector('h2').textContent;
-                factor.querySelectorAll('.subfactor').forEach(sub => {
-                    const row = {
-                        '一级指标': factorName,
-                        '二级指标': sub.querySelector('label').textContent.replace(/\s+/g, ' '),
-                        '得分': parseFloat(sub.querySelector('[data-custom="weighted"], .weighted').value) || 0
-                    };
-                    data.push(row);
-                });
-            });
+    const data = [['一级指标', '一级指标得分', '二级指标', '得分']]; // 表头
+    const merges = [];
+    let currentRow = 1; // 当前数据行（从表头下一行开始）
 
-            // 创建工作簿
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "评估结果");
+    document.querySelectorAll('.factor').forEach(factor => {
+        const factorName = factor.querySelector('h2').textContent.trim();
+        const subItems = factor.querySelectorAll('.subfactor');
+        const level1Score = parseFloat(factor.querySelector('.total-box').textContent.replace('本指标得分：', '')) || 0;
+
+        // 记录合并起始行
+        const startRow = currentRow;
+
+        // 添加首行（一级指标 + 得分 + 第一个二级指标）
+        if(subItems.length > 0) {
+            const firstSub = subItems[0];
+            const subName = firstSub.querySelector('label').textContent.trim();
+            const score = parseFloat(firstSub.querySelector('[data-custom="weighted"], .weighted').value) || 0;
             
-            // 生成文件名
-            const today = new Date();
-            const dateString = 
-                String(today.getMonth() + 1).padStart(2, '0') + 
-                String(today.getDate()).padStart(2, '0');
-            
-            // 导出文件
-            XLSX.writeFile(wb, `整治得分_${dateString}.xlsx`);
+            data.push([
+                factorName,
+                level1Score.toFixed(2),
+                subName,
+                score.toFixed(2)
+            ]);
+            currentRow++;
         }
+
+        // 添加剩余二级指标（前两列留空）
+        for(let i = 1; i < subItems.length; i++) {
+            const sub = subItems[i];
+            const subName = sub.querySelector('label').textContent.trim();
+            const score = parseFloat(sub.querySelector('[data-custom="weighted"], .weighted').value) || 0;
+            
+            data.push(["", "", subName, score.toFixed(2)]);
+            currentRow++;
+        }
+
+        // 设置合并范围（合并所有相关行）
+        if(subItems.length > 0) {
+            merges.push(
+                { s: { r: startRow, c: 0 }, e: { r: currentRow - 1, c: 0 } }, // 合并一级指标列
+                { s: { r: startRow, c: 1 }, e: { r: currentRow - 1, c: 1 } }  // 合并得分列
+            );
+        }
+    });
+
+    // 创建Excel工作表
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    
+    // 设置格式
+    ws['!cols'] = [
+        { wch: 30 }, // 一级指标
+        { wch: 15 }, // 一级指标得分
+        { wch: 30 }, // 二级指标
+        { wch: 10 }  // 得分
+    ];
+    ws['!merges'] = merges;
+
+    // 设置单元格样式（居中+自动换行）
+    const range = XLSX.utils.decode_range(ws['!ref']);
+    for(let R = range.s.r; R <= range.e.r; R++) {
+        for(let C = range.s.c; C <= range.e.c; C++) {
+            const cell = ws[XLSX.utils.encode_cell({r:R,c:C})];
+            cell.s = {
+                alignment: {
+                    vertical: "center",
+                    horizontal: "center",
+                    wrapText: true
+                }
+            };
+            // 加粗一级指标行
+            if(R > 0 && data[R][0] !== ""){
+                cell.s.font = { bold: true };
+            }
+        }
+    }
+
+    // 导出文件
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "评估结果");
+    const dateStr = new Date().toISOString().slice(0,10).replace(/-/g, "");
+    XLSX.writeFile(wb, `整治得分_${dateStr}.xlsx`);
+}
 
         // 跳转Deepseek
         function gotoDeepseek() {
